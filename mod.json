@@ -1,0 +1,48 @@
+{
+    "Name": "SCROLLABLE_LIST_TEST",
+    "LoadPriority": 2,
+    "Version": "0.0.1",
+    "ConVars": [
+        {
+            "Name": "dotres_debug_draw_dimensions",
+            "DefaultValue": "0"
+        }
+    ],
+    "Scripts": [
+        {
+            "Path": "ui/dotres_utility.nut",
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/scrollbar.nut",
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/scrollable_list_item.nut",
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/scrollable_list.nut",
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/tooltip.nut",
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/dropdown.nut",
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "DropDownSubMenu_Init"
+            }
+        },
+        {
+            "Path": "ui/profiles_menu.nut",
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "InitProfilesMenu",
+                "After": "ProfilesAddFooter"
+            }
+        }
+    ]
+}
