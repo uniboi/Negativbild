@@ -163,7 +163,7 @@ resource/ui/menus/panels/scrollable_list.res
 
 		controlSettingsFile	"resource/ui/menus/panels/internal/scrollable_list_item.res"
 	}
-	
+
 	Item15
 	{
 		ControlName			CNestedPanel
@@ -179,9 +179,5 @@ resource/ui/menus/panels/scrollable_list.res
 		visible				0
 
 		controlSettingsFile	"resource/ui/menus/panels/internal/scrollable_list_item.res"
-
-		pin_to_sibling				Item15
-		pin_corner_to_sibling		TOP
-		pin_to_sibling_corner		BOTTOM
 	}
 }
