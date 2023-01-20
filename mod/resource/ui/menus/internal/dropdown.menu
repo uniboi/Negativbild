@@ -33,10 +33,15 @@ resource/ui/menus/dropdown.menu
 
 		Frame
 		{
-			ControlName				RuiPanel
-			wide					300
-			tall					500
-			rui                     "ui/knowledgebase_panel.rpak"
+			ControlName	ImagePanel
+
+			wide		300
+			tall		500
+			rui			"ui/knowledgebase_panel.rpak"
+
+			image		vgui/hud/white
+			drawcolor	"30 30 30 180"
+			scaleImage	1
 		}
 
 		OptionsList
