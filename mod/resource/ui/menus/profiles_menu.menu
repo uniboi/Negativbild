@@ -135,30 +135,43 @@ resource/ui/menus/profiles_menu.menu
 //		pin_to_sibling_corner		LEFT
 //	}
 
-	ColorCircle
-	{
-		ControlName	ImagePanel
-		image		vgui/color_circle
-		scaleImage	1
+//	ColorCircle
+//	{
+//		ControlName	ImagePanel
+//		image		vgui/color_circle
+//		scaleImage	1
+//
+//		tall	300
+//		wide	300
+//
+//		pin_to_sibling				TestList
+//		pin_corner_to_sibling		RIGHT
+//		pin_to_sibling_corner		LEFT
+//	}
+//
+//	ColorIndicator
+//	{
+//		ControlName ImagePanel
+//		image		vgui/hud/white
+//		scaleImage	1
+//
+//		tall	50
+//		wide	50
+//
+//		pin_to_sibling				ColorCircle
+//		pin_corner_to_sibling		RIGHT
+//		pin_to_sibling_corner		LEFT
+//	}
 
+	ColorPicker
+	{
+		ControlName	CNestedPanel
+		controlSettingsFile	"resource/ui/menus/panels/color_picker.res"
+
+		wide	375
 		tall	300
-		wide	300
 
 		pin_to_sibling				TestList
-		pin_corner_to_sibling		RIGHT
-		pin_to_sibling_corner		LEFT
-	}
-
-	ColorIndicator
-	{
-		ControlName ImagePanel
-		image		vgui/hud/white
-		scaleImage	1
-
-		tall	50
-		wide	50
-
-		pin_to_sibling				ColorCircle
 		pin_corner_to_sibling		RIGHT
 		pin_to_sibling_corner		LEFT
 	}

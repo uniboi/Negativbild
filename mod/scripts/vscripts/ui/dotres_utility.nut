@@ -8,9 +8,6 @@ void function Negativbild_Init()
 	// print("██░██░██░█████░░░██░░░██░░███████░░░░██░░░░██░░██░░██░░██████░░██░██░░░░░░██░░░██░")
 	// print("██░░████░██░░░░░░██░░░░██░██░░░██░░░░██░░░░██░░░████░░░██░░░██░██░██░░░░░░██░░░██░")
 	// print("██░░░███░███████░░██████░░██░░░██░░░░██░░░░██░░░░██░░░░██████░░██░███████░██████░░")
-
-    AddSubmenu( "DropDownMenu", $"resource/ui/menus/internal/dropdown.menu", InitDropDownMenu )
-	RegisterSignal( "DropDownSelected" )
 }
 
 bool function dotresDimensions()

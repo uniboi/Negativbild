@@ -35,11 +35,17 @@
         },
         {
             "Path": "ui/components/dropdown.nut",
-            "RunOn": "UI"
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "DropDownMenus_Init"
+            }
         },
         {
             "Path": "ui/components/color_picker.nut",
-            "RunOn": "UI"
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "ColorPickers_Init"
+            }
         },
         {
             "Path": "ui/profiles_menu.nut",

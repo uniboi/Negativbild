@@ -1,4 +1,4 @@
-global function InitDropDownMenu
+global function DropDownMenus_Init
 global function OpenDropDown
 global function OpenDropDownCalc
 
@@ -7,6 +7,12 @@ struct {
 } file
 
 const MAX_LIST_NODES = 5
+
+void function DropDownMenus_Init()
+{
+    AddSubmenu( "DropDownMenu", $"resource/ui/menus/internal/dropdown.menu", InitDropDownMenu )
+	RegisterSignal( "DropDownSelected" )
+}
 
 void function InitDropDownMenu()
 {
