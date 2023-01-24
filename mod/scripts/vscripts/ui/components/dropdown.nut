@@ -1,16 +1,12 @@
-global function DropDownSubMenu_Init
+global function InitDropDownMenu
 global function OpenDropDown
+global function OpenDropDownCalc
 
 struct {
     ScrollableList& sl
 } file
 
 const MAX_LIST_NODES = 5
-
-void function DropDownSubMenu_Init()
-{
-    AddSubmenu( "DropDownMenu", $"resource/ui/menus/internal/dropdown.menu", InitDropDownMenu )
-}
 
 void function InitDropDownMenu()
 {
@@ -32,7 +28,8 @@ void function InitDropDownMenu()
 			_ScrollbarContentListener( UIE_CLICK,
 				void function( var button, ScrollbarContent sc )
 				{
-					printt( "CLICK:", sc.title, sc.contentIndex )
+					Signal( uiGlobal.signalDummy, "DropDownSelected", { title = sc.title, index = sc.contentIndex } )
+					CloseSubmenu()
 				}
 			)
 		]
@@ -51,7 +48,7 @@ void function OnDropDown_Close()
 
 void function OnDropDown_BGActivate( var button )
 {
-    OnDropDown_NavigateBack()
+    CloseSubmenu()
 }
 
 void function OnDropDown_NavigateBack()
@@ -64,9 +61,9 @@ void function OnDropDown_NavigateBack()
 //     Hud_AddEventHandler( opener, UIE_CLICK, OpenDropDown )
 // }
 
-void function OpenDropDown( array<string> contents )
+void function OpenDropDown_Internal( array<string> contents, int[2] functionref( var ) positionCallback )
 {
-    OpenDropDownSubmenu( GetMenu( "DropDownMenu" ) )
+    OpenDropDownSubmenu( GetMenu( "DropDownMenu" ), positionCallback )
 
     int height = contents.len() * SCROLLBAR_ITEM_HEIGHT
 
@@ -79,10 +76,45 @@ void function OpenDropDown( array<string> contents )
     Hud_SetHeight( Hud_GetChild( GetMenu( "DropDownMenu" ), "Frame" ), height )
 }
 
-//? maybe change back to OpenSubmenu instead
+void function OpenDropDown( array<string> contents )
+{
+	OpenDropDown_Internal( contents, DefaultSubmenuPosition )
+}
+
+// Needed because default params need to be const and it's impossible to cast ornull to a functionref
+void function OpenDropDownCalc( array<string> contents, int[2] functionref( var ) positionCallback )
+{
+	OpenDropDown_Internal( contents, positionCallback )
+}
+
+int[2] function DefaultSubmenuPosition( var frame )
+{
+	int[2] p
+	vector ornull c = NSGetCursorPosition()
+
+	if( c == null )
+	{
+		var focus = GetFocus()
+		array focusPos = expect array( Hud_GetAbsPos( focus ) )
+		p[0] = expect int( focusPos[0] ) + Hud_GetWidth( focus ) - Hud_GetWidth( frame )
+		p[1] = expect int( focusPos[1] ) + Hud_GetHeight( focus )
+	}
+	else
+	{
+		expect vector( c )
+		int[2] screenSize = GetScreenSize()
+
+		if( c.x + Hud_GetWidth( frame ) > screenSize[0] )
+			p[0] = screenSize[0] - Hud_GetWidth( frame )
+		else
+			p[0] = int( c.x )
+		p[1] = int( c.y )
+	}
+	return p
+}
 
 // slightly modified version of OpenSubmenu in _menus.nut
-void function OpenDropDownSubmenu( var menu, bool updateMenuPos = true )
+void function OpenDropDownSubmenu( var menu, int[2] functionref( var ) positionCallback )
 {
 	if ( uiGlobal.activeMenu )
 	{
@@ -91,18 +123,15 @@ void function OpenDropDownSubmenu( var menu, bool updateMenuPos = true )
 			return
 	}
 
-	array submenuPos = expect array( Hud_GetAbsPos( GetFocus() ) )
 
 	uiGlobal.menuStack.push( menu )
 	uiGlobal.activeMenu = menu
 
 	OpenMenuWrapper( uiGlobal.activeMenu, true )
 
-	if ( updateMenuPos )
-	{
-		var vguiButtonFrame = Hud_GetChild( uiGlobal.activeMenu, "Frame" )
-		Hud_SetPos( vguiButtonFrame, expect int( submenuPos[0] ), expect int( submenuPos[1] ) + Hud_GetHeight( GetFocus() ) )
-	}
+	var vguiFrame = Hud_GetChild( uiGlobal.activeMenu, "Frame" )
+	int[2] submenuPos = positionCallback( vguiFrame )
+	Hud_SetPos( vguiFrame, submenuPos[0], submenuPos[1] )
 
 	uiGlobal.lastMenuNavDirection = MENU_NAV_FORWARD
 

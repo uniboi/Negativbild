@@ -1,5 +1,6 @@
 {
-    "Name": "SCROLLABLE_LIST_TEST",
+    "Name": "Negativbild",
+    "Description": "A UI Library that adds various QOL features.",
     "LoadPriority": 2,
     "Version": "0.0.1",
     "ConVars": [
@@ -11,7 +12,10 @@
     "Scripts": [
         {
             "Path": "ui/dotres_utility.nut",
-            "RunOn": "UI"
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "Negativbild_Init"
+            }
         },
         {
             "Path": "ui/components/scrollbar.nut",
@@ -31,10 +35,11 @@
         },
         {
             "Path": "ui/components/dropdown.nut",
-            "RunOn": "UI",
-            "UICallback": {
-                "Before": "DropDownSubMenu_Init"
-            }
+            "RunOn": "UI"
+        },
+        {
+            "Path": "ui/components/color_picker.nut",
+            "RunOn": "UI"
         },
         {
             "Path": "ui/profiles_menu.nut",
@@ -42,6 +47,13 @@
             "UICallback": {
                 "Before": "InitProfilesMenu",
                 "After": "ProfilesAddFooter"
+            }
+        },
+        {
+            "Path": "ui/ms_test.nut",
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "ModSettingsTest"
             }
         }
     ]

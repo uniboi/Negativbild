@@ -1,6 +1,7 @@
 global function RegisterScrollableList
 global function UpdateScrollableListContent
 global function UpdateScrollableListHeight
+global function ScrollList
 global function _ScrollbarContentListener
 global function Debug1
 global function Debug2
@@ -110,6 +111,8 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         sl.contents.append( sc )
     }
 
+    var prevNodeButton = null
+
     // Build nodes
     for( int i; i < buttonsLength; i++ )
     {
@@ -135,6 +138,12 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
             if( !sl.contents[ sl.contentOffset + i ].disabled )
                 Hud_SetColor( label, COLOR_INACTIVE.x, COLOR_INACTIVE.y, COLOR_INACTIVE.z, 255 )
         } )
+
+        if( prevNodeButton )
+        {
+            Hud_SetNavDown( prevNodeButton, button )
+            prevNodeButton = button
+        }
     }
 
     file.scrollableLists.append(sl)
@@ -276,4 +285,9 @@ void function SetLabelColor( var label, bool disabled )
         Hud_SetColor( label, COLOR_DISABLED.x, COLOR_DISABLED.y, COLOR_DISABLED.z, 255 )
     else
         Hud_SetColor( label, COLOR_INACTIVE.x, COLOR_INACTIVE.y, COLOR_INACTIVE.z, 255 )
+}
+
+void function ScrollList( ScrollableList sl, int height )
+{
+    UICodeCallback_MouseMovementCapture( Hud_GetChild( sl.scrollbar, "MouseMovementCapture" ), 0, height )
 }
