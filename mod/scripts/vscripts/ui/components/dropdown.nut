@@ -1,6 +1,8 @@
 global function DropDownMenus_Init
 global function OpenDropDown
 global function OpenDropDownCalc
+global function DefaultSubmenuPosition
+global function OpenDropDownSubmenu
 
 struct {
     ScrollableList& sl

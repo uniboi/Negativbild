@@ -28,7 +28,7 @@ void function HideDebugFrame( var p, var frame = null )
     if( dotresDimensions() ) Hud_Hide( frame )
 }
 
-void function AddModSettingsDropDown( string buttonLabel, string conVar, array<string> options, bool useIndex = false )
+void function AddModSettingsDropDown( string conVar, string buttonLabel, array<string> options, bool useIndex = false )
 {
     AddModSettingsButton( buttonLabel, 
         void function() : ( options, conVar, useIndex )
@@ -44,6 +44,21 @@ void function AddModSettingsDropDown( string buttonLabel, string conVar, array<s
                 {
                     SetConVarString( conVar, expect string( WaitSignal( uiGlobal.signalDummy, "DropDownSelected" ).title ) )
                 }
+            }()
+        }, 3
+    )
+}
+
+void function AddModSettingsColorPicker( string conVar, string buttonLabel )
+{
+    AddModSettingsButton( buttonLabel,
+        void function() : ( conVar )
+        {
+            OpenColorPickerDialog()
+            thread void function() : ( conVar )
+            {
+                vector rgb = expect vector( WaitSignal( uiGlobal.signalDummy, "ColorPickerSelected" )["color"] )
+                SetConVarString( conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
             }()
         }, 3
     )

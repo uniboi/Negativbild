@@ -48,6 +48,13 @@
             }
         },
         {
+            "Path": "ui/components/color_picker_dialog.nut",
+            "RunOn": "UI",
+            "UICallback": {
+                "Before": "ColorPickerDialog_Init"
+            }
+        },
+        {
             "Path": "ui/profiles_menu.nut",
             "RunOn": "UI",
             "UICallback": {

@@ -1,0 +1,69 @@
+resource/ui/menus/internal/color_picker.menu
+{
+	menu
+	{
+		ControlName				Frame
+		xpos					0
+		ypos					0
+		zpos					3
+		wide					f0
+		tall					f0
+		autoResize				0
+		pinCorner				0
+		visible					1
+		enabled					1
+		PaintBackgroundType		0
+		infocus_bgcolor_override	"0 0 0 0"
+		outoffocus_bgcolor_override	"0 0 0 0"
+		modal					1
+		clip					0
+
+		Screen
+		{
+			ControlName				RuiButton
+			wide					%100
+			tall					%100
+			visible					1
+			scaleImage				1
+			fillColor				"0 0 0 0"
+			drawColor				"0 0 0 0"
+			labelText 				""
+			rui                     "ui/basic_image.rpak"
+		}
+
+		Frame
+		{
+			ControlName	ImagePanel
+
+			wide		700
+			tall		700
+			rui			"ui/knowledgebase_panel.rpak"
+
+			image		vgui/hud/white
+			drawcolor	"30 30 30 180"
+			scaleImage	1
+		}
+
+		ColorPicker
+		{
+			ControlName			CNestedPanel
+
+			wide				500
+			tall				500
+
+			controlSettingsFile	"resource/ui/menus/panels/color_picker.res"
+
+			pin_to_sibling				Frame
+			pin_corner_to_sibling		CENTER
+			pin_to_sibling_corner		CENTER
+		}
+
+// FOOTER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		FooterButtons
+		{
+			ControlName				CNestedPanel
+			InheritProperties       FooterButtons
+		}
+	}
+}

@@ -6,5 +6,6 @@ void function ModSettingsTest()
     AddModCategory( "lessgo" )
     AddConVarSettingEnum( "dotres_debug_draw_dimensions", "dotres debug", ["0", "1"] )
 
-    AddModSettingsDropDown( "debug draw dimensions (dotres) - using index", "dotres_debug_draw_dimensions", ["Disabled", "Enabled" ], true )
+    AddModSettingsDropDown( "dotres_debug_draw_dimensions", "debug draw dimensions (dotres) - using index", ["Disabled", "Enabled" ], true )
+    AddModSettingsColorPicker( "dotres_debug_draw_dimensions", "color picker test" )
 }
