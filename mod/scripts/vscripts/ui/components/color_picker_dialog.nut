@@ -37,6 +37,16 @@ void function OnDialog_Close()
     Signal( uiGlobal.signalDummy, "ColorPickerKill" )
 }
 
+void function OnDialog_Open()
+{
+    Signal( uiGlobal.signalDummy, "ColorPickerRevive" )
+}
+
+void function OnDialog_Close()
+{
+    Signal( uiGlobal.signalDummy, "ColorPickerKill" )
+}
+
 void function OnScreen_BGActivate( var button )
 {
     CloseSubmenu()
