@@ -1,14 +1,7 @@
 global function ColorPickers_Init
 global function RegisterColorPicker
 
-struct ColorPicker {
-    var circle
-    var indicator
-    vector lastColor
-}
-
 struct {
-    array<ColorPicker> pickers
     int did
     table ornull lastPicker = null
 } file
@@ -29,52 +22,17 @@ void function OnClick( var button )
         return
     expect table( picker )
 
-    // printt( picker.lastColor )
     Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
-
-        // while( true )
-        // {
-        //     table picker = expect table( WaitSignal( uiGlobal.signalDummy, "ColorPickerRevive" )["picker"] )
-        //     var circle = picker["circle"]
-        //     vector ornull p = NSGetCursorPosition()
-
-        //     if( p == null )
-        //         return
-        //     expect vector( p )
-
-        //     // foreach( picker in file.pickers)
-        //     // {
-        //         // int circleAbsX = Hud_GetAbsX( picker.circle )
-        //         // int circleAbsY = Hud_GetAbsY( picker.circle )
-        //         // int circleDiameter = Hud_GetWidth( picker.circle )
-                
-        //         int circleAbsX = Hud_GetAbsX( circle )
-        //         int circleAbsY = Hud_GetAbsY( circle )
-        //         int circleDiameter = Hud_GetWidth( circle )
-
-        //         printt( picker )
-
-        //         if( !(p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter) )
-        //         {
-        //             printt( picker.lastColor )
-        //             Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
-        //         }
-
-        //         // break
-        //     // }
-        // }
 }
 
 table<string, var> function RegisterColorPicker( var elem )
 {
     table<string, var> pc
-    // ColorPicker pc
     pc.circle <- Hud_GetChild( elem, "ColorCircle" )
     pc.indicator <- Hud_GetChild( elem, "ColorIndicator" )
-    pc.lastColor <- < 0, 0, 0 >
+    pc.lastColor <- null
     pc.id <- file.did
     file.did++
-    // file.pickers.append( pc )
     thread CursorPositionChecker_Guard( elem )
     return pc
 }
@@ -106,47 +64,44 @@ void function CursorPositionChecker_Threaded( table observedPicker )
         if( p != null )
         {
             expect vector( p )
-            // foreach( picker in file.pickers)
-            // {
-                var circle = observedPicker["circle"]
-	            int circleAbsX = Hud_GetAbsX( circle )
-	            int circleAbsY = Hud_GetAbsY( circle )
-	            int circleDiameter = Hud_GetWidth( circle )
-	            int circleRadius = circleDiameter / 2
 
-            	if( !(p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter) )
-                {
-                    vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
-                    vector rp = p - circleCenter
-                    rp.x = rp.x / circleRadius
-                    rp.y = -(rp.y / circleRadius)
+            var circle = observedPicker["circle"]
+	        int circleAbsX = Hud_GetAbsX( circle )
+	        int circleAbsY = Hud_GetAbsY( circle )
+	        int circleDiameter = Hud_GetWidth( circle )
+	        int circleRadius = circleDiameter / 2
+            vector origin = < circleAbsX + circleRadius, circleAbsY + circleRadius, 0 >
 
-                    vector rgb = rectoToRGB( rp )
+            if( Length2DSqr( origin - p ) < circleRadius * circleRadius )
+            {
+                vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
+                vector rp = p - circleCenter
+                rp.x = rp.x / circleRadius
+                rp.y = -(rp.y / circleRadius)
 
-                    Hud_SetColor( observedPicker["indicator"], rgb.x, rgb.y, rgb.z )
-                    observedPicker["lastColor"] <- rgb
-                }
+                vector rgb = PositionToRGB( rp )
 
-            //     break
-            // }
+                Hud_SetColor( observedPicker["indicator"], rgb.x, rgb.y, rgb.z )
+                observedPicker["lastColor"] <- rgb
+            }
         }
         WaitFrame()
     }
 }
 
-vector function rectoToRGB( vector pos )
+vector function PositionToRGB( vector pos )
 {
 	float r = sqrt( pos.x * pos.x + pos.y * pos.y )
 	float sat = r > 1.0 ? 0.0 : r
-	float hue = rad2deg( atan2( pos.y, pos.x ) )
-	return hsv2rgb( hue, sat, 1.0 )
+	float hue = RadiantToDegree( atan2( pos.y, pos.x ) )
+	return HSVToRGB( hue, sat, 1.0 )
 }
 
-float function rad2deg( float rad ) {
+float function RadiantToDegree( float rad ) {
   return (360 + 180 * rad / PI) % 360;
 }
 
-vector function hsv2rgb(float hue, float saturation, float value) {
+vector function HSVToRGB(float hue, float saturation, float value) {
   hue /= 60;
   float chroma = value * saturation;
   float x = chroma * (1 - fabs((hue % 2) - 1));
