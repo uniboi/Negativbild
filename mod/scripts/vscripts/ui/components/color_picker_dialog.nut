@@ -16,10 +16,25 @@ void function InitColorPickerMenu()
     var menu = GetMenu( "ColorPickerMenu" )
     file.picker = Hud_GetChild( menu, "ColorPicker" )
 
+	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, OnDialog_Open )
+	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, OnDialog_Close )
+
 	var screen = Hud_GetChild( menu, "Screen" )
 	var rui = Hud_GetRui( screen )
 	RuiSetFloat( rui, "basicImageAlpha", 0.0 )
 	Hud_AddEventHandler( screen, UIE_CLICK, OnScreen_BGActivate )
+
+    RegisterColorPicker( file.picker )
+}
+
+void function OnDialog_Open()
+{
+    Signal( uiGlobal.signalDummy, "ColorPickerRevive" )
+}
+
+void function OnDialog_Close()
+{
+    Signal( uiGlobal.signalDummy, "ColorPickerKill" )
 }
 
 void function OnScreen_BGActivate( var button )

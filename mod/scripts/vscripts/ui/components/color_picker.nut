@@ -4,6 +4,7 @@ global function RegisterColorPicker
 struct ColorPicker {
     var circle
     var indicator
+    vector lastColor
 }
 
 struct {
@@ -32,19 +33,11 @@ void function OnClick( var button )
         int circleAbsX = Hud_GetAbsX( picker.circle )
         int circleAbsY = Hud_GetAbsY( picker.circle )
         int circleDiameter = Hud_GetWidth( picker.circle )
-        int circleRadius = circleDiameter / 2
 
         if( p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter )
               continue
-            
-        vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
-        vector rp = p - circleCenter
-	    rp.x = rp.x / circleRadius
-	    rp.y = -(rp.y / circleRadius)
 
-        vector rgb = rectoToRGB( rp )
-
-        Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = rgb } )
+        Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
         break
     }
 }
@@ -94,6 +87,7 @@ void function CursorPositionChecker_Threaded( var elem )
                 vector rgb = rectoToRGB( rp )
 
                 Hud_SetColor( picker.indicator, rgb.x, rgb.y, rgb.z )
+                picker.lastColor = rgb
                 break
             }
         }

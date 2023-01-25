@@ -35,8 +35,8 @@ resource/ui/menus/internal/color_picker.menu
 		{
 			ControlName	ImagePanel
 
-			wide		700
-			tall		700
+			wide		450
+			tall		350
 			rui			"ui/knowledgebase_panel.rpak"
 
 			image		vgui/hud/white
@@ -48,14 +48,32 @@ resource/ui/menus/internal/color_picker.menu
 		{
 			ControlName			CNestedPanel
 
-			wide				500
-			tall				500
+			wide				375
+			tall				300
+
+			//xpos	25
 
 			controlSettingsFile	"resource/ui/menus/panels/color_picker.res"
 
 			pin_to_sibling				Frame
-			pin_corner_to_sibling		CENTER
-			pin_to_sibling_corner		CENTER
+			pin_corner_to_sibling		RIGHT
+			pin_to_sibling_corner		RIGHT
+		}
+
+		LastColorIndicator
+		{
+			ControlName ImagePanel
+			image		vgui/hud/white
+			scaleImage	1
+
+			tall	50
+			wide	50
+
+	        xpos    25
+
+			pin_to_sibling				ColorPicker
+			pin_corner_to_sibling		RIGHT
+			pin_to_sibling_corner		LEFT
 		}
 
 // FOOTER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

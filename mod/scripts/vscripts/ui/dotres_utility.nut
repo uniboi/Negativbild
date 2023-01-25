@@ -55,10 +55,13 @@ void function AddModSettingsColorPicker( string conVar, string buttonLabel )
         void function() : ( conVar )
         {
             OpenColorPickerDialog()
+            array<string> split = split( GetConVarString( conVar ), " " )
+            Hud_SetColor( Hud_GetChild( GetMenu( "ColorPickerMenu" ), "LastColorIndicator" ), float( split[0]), float( split[1]), float( split[2] ) )
             thread void function() : ( conVar )
             {
                 vector rgb = expect vector( WaitSignal( uiGlobal.signalDummy, "ColorPickerSelected" )["color"] )
                 SetConVarString( conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
+                CloseSubmenu()
             }()
         }, 3
     )
