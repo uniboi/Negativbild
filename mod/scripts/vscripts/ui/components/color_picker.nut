@@ -2,7 +2,6 @@ global function ColorPickers_Init
 global function RegisterColorPicker
 
 struct {
-    int did
     table ornull lastPicker = null
 } file
 
@@ -31,8 +30,6 @@ table<string, var> function RegisterColorPicker( var elem )
     pc.circle <- Hud_GetChild( elem, "ColorCircle" )
     pc.indicator <- Hud_GetChild( elem, "ColorIndicator" )
     pc.lastColor <- null
-    pc.id <- file.did
-    file.did++
     thread CursorPositionChecker_Guard( elem )
     return pc
 }
