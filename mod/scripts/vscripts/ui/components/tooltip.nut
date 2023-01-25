@@ -31,7 +31,10 @@ void function AddTooltipToElement( var elem, string tooltipText, int width = 0 )
             SetLabelRuiText( Hud_GetChild( tooltip, "Display" ), tooltipText )
 
             var frame = Hud_GetChild( tooltip, "Frame" )
-            Hud_SetWidth( frame, width + 40 )
+            int finalWidth = width
+            if( width )
+                finalWidth += 40
+            Hud_SetWidth( frame, finalWidth )
         }
     )
 
