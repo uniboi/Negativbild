@@ -9,6 +9,8 @@ struct ColorPicker {
 
 struct {
     array<ColorPicker> pickers
+    int did
+    table ornull lastPicker = null
 } file
 
 void function ColorPickers_Init()
@@ -21,77 +23,113 @@ void function ColorPickers_Init()
 
 void function OnClick( var button )
 {
-    vector ornull p = NSGetCursorPosition()
-
-    if( p == null )
+    printt(file.lastPicker)
+    table ornull picker = file.lastPicker
+    if( picker == null )
         return
-    expect vector( p )
+    expect table( picker )
 
+    // printt( picker.lastColor )
+    Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
 
-    foreach( picker in file.pickers)
-    {
-        int circleAbsX = Hud_GetAbsX( picker.circle )
-        int circleAbsY = Hud_GetAbsY( picker.circle )
-        int circleDiameter = Hud_GetWidth( picker.circle )
+        // while( true )
+        // {
+        //     table picker = expect table( WaitSignal( uiGlobal.signalDummy, "ColorPickerRevive" )["picker"] )
+        //     var circle = picker["circle"]
+        //     vector ornull p = NSGetCursorPosition()
 
-        if( p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter )
-              continue
+        //     if( p == null )
+        //         return
+        //     expect vector( p )
 
-        Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
-        break
-    }
+        //     // foreach( picker in file.pickers)
+        //     // {
+        //         // int circleAbsX = Hud_GetAbsX( picker.circle )
+        //         // int circleAbsY = Hud_GetAbsY( picker.circle )
+        //         // int circleDiameter = Hud_GetWidth( picker.circle )
+                
+        //         int circleAbsX = Hud_GetAbsX( circle )
+        //         int circleAbsY = Hud_GetAbsY( circle )
+        //         int circleDiameter = Hud_GetWidth( circle )
+
+        //         printt( picker )
+
+        //         if( !(p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter) )
+        //         {
+        //             printt( picker.lastColor )
+        //             Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
+        //         }
+
+        //         // break
+        //     // }
+        // }
 }
 
-void function RegisterColorPicker( var elem )
+table<string, var> function RegisterColorPicker( var elem )
 {
-    ColorPicker pc
-    pc.circle = Hud_GetChild( elem, "ColorCircle" )
-    pc.indicator = Hud_GetChild( elem, "ColorIndicator" )
-    file.pickers.append( pc )
+    table<string, var> pc
+    // ColorPicker pc
+    pc.circle <- Hud_GetChild( elem, "ColorCircle" )
+    pc.indicator <- Hud_GetChild( elem, "ColorIndicator" )
+    pc.lastColor <- < 0, 0, 0 >
+    pc.id <- file.did
+    file.did++
+    // file.pickers.append( pc )
     thread CursorPositionChecker_Guard( elem )
+    return pc
 }
 
 void function CursorPositionChecker_Guard( var elem )
 {
     while( true )
     {
-        WaitSignal( uiGlobal.signalDummy, "ColorPickerRevive" )
-        thread CursorPositionChecker_Threaded( elem )
+        table picker = expect table( WaitSignal( uiGlobal.signalDummy, "ColorPickerRevive" )["picker"] )
+        file.lastPicker = picker
+        thread CursorPositionChecker_Threaded( picker )
     }
 }
 
-void function CursorPositionChecker_Threaded( var elem )
+void function CursorPositionChecker_Threaded( table observedPicker )
 {
     EndSignal( uiGlobal.signalDummy, "ColorPickerKill" )
+
+    OnThreadEnd(
+        void function()
+        {
+            file.lastPicker = null
+        }
+    )
+
     while( true )
     {
         vector ornull p = NSGetCursorPosition()
         if( p != null )
         {
             expect vector( p )
-            foreach( picker in file.pickers)
-            {
-	            int circleAbsX = Hud_GetAbsX( picker.circle )
-	            int circleAbsY = Hud_GetAbsY( picker.circle )
-	            int circleDiameter = Hud_GetWidth( picker.circle )
+            // foreach( picker in file.pickers)
+            // {
+                var circle = observedPicker["circle"]
+	            int circleAbsX = Hud_GetAbsX( circle )
+	            int circleAbsY = Hud_GetAbsY( circle )
+	            int circleDiameter = Hud_GetWidth( circle )
 	            int circleRadius = circleDiameter / 2
 
-            	if( p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter )
-                    continue
+            	if( !(p.x < circleAbsX || p.x > circleAbsX + circleDiameter || p.y < circleAbsY || p.y > circleAbsY + circleDiameter) )
+                {
+                    vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
+                    vector rp = p - circleCenter
+                    rp.x = rp.x / circleRadius
+                    rp.y = -(rp.y / circleRadius)
 
-                vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
-                vector rp = p - circleCenter
-	            rp.x = rp.x / circleRadius
-	            rp.y = -(rp.y / circleRadius)
+                    vector rgb = rectoToRGB( rp )
 
-                vector rgb = rectoToRGB( rp )
+                    Hud_SetColor( observedPicker["indicator"], rgb.x, rgb.y, rgb.z )
+                    observedPicker["lastColor"] <- rgb
+                }
 
-                Hud_SetColor( picker.indicator, rgb.x, rgb.y, rgb.z )
-                picker.lastColor = rgb
-                break
-            }
+            //     break
+            // }
         }
-
         WaitFrame()
     }
 }

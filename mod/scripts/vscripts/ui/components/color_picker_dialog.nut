@@ -3,7 +3,9 @@ global function OpenColorPickerDialog
 global function OpenColorPickerDialogCalc
 
 struct {
-    var picker
+    table<string, var> picker
+    string conVar
+    var menu
 } file
 
 void function ColorPickerDialog_Init()
@@ -13,37 +15,54 @@ void function ColorPickerDialog_Init()
 
 void function InitColorPickerMenu()
 {
-    var menu = GetMenu( "ColorPickerMenu" )
-    file.picker = Hud_GetChild( menu, "ColorPicker" )
+    file.menu = GetMenu( "ColorPickerMenu" )
+    // file.picker = Hud_GetChild( menu, "ColorPicker" )
 
-	AddMenuEventHandler( menu, eUIEvent.MENU_OPEN, OnDialog_Open )
-	AddMenuEventHandler( menu, eUIEvent.MENU_CLOSE, OnDialog_Close )
+	AddMenuEventHandler( file.menu, eUIEvent.MENU_OPEN, OnDialog_Open )
+	AddMenuEventHandler( file.menu, eUIEvent.MENU_CLOSE, OnDialog_Close )
 
-	var screen = Hud_GetChild( menu, "Screen" )
+	var screen = Hud_GetChild( file.menu, "Screen" )
 	var rui = Hud_GetRui( screen )
 	RuiSetFloat( rui, "basicImageAlpha", 0.0 )
 	Hud_AddEventHandler( screen, UIE_CLICK, OnScreen_BGActivate )
 
-    RegisterColorPicker( file.picker )
+    file.picker = RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
 }
 
 void function OnDialog_Open()
 {
-    Signal( uiGlobal.signalDummy, "ColorPickerRevive" )
+    Signal( uiGlobal.signalDummy, "ColorPickerRevive", { picker = file.picker } )
+    array<string> split = split( GetConVarString( file.conVar ), " " )
+    Hud_SetColor( Hud_GetChild( file.menu, "LastColorIndicator" ), float( split[0]), float( split[1]), float( split[2] ) )
+    
 }
 
 void function OnDialog_Close()
 {
     Signal( uiGlobal.signalDummy, "ColorPickerKill" )
+    SetConVarV()
 }
 
 void function OnScreen_BGActivate( var button )
 {
     CloseSubmenu()
+    SetConVarV()
 }
 
-void function OpenColorPickerDialog()
+void function SetConVarV()
 {
+    vector ornull rgb = expect vector ornull( file.picker.lastColor )
+    if(rgb == null)
+        return
+    expect vector( rgb )
+    printt( "UPDATING CONVAR: " + file.conVar, "^^^^^^^^^^^^^^^^^^" )
+    SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
+}
+
+void function OpenColorPickerDialog( string conVar )
+{
+    file.conVar = conVar
+    file.picker.lastColor = null
 	OpenColorPickerDialog_Internal(DefaultSubmenuPosition )
 }
 
@@ -55,5 +74,5 @@ void function OpenColorPickerDialogCalc( int[2] functionref( var ) positionCallb
 
 void function OpenColorPickerDialog_Internal( int[2] functionref( var ) positionCallback )
 {
-    OpenDropDownSubmenu( GetMenu( "ColorPickerMenu" ), positionCallback )
+    OpenDropDownSubmenu( file.menu, positionCallback )
 }

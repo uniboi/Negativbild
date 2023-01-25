@@ -4,8 +4,7 @@ global function ProfilesAddFooter
 
 struct {
 	var menu
-	var colorTile
-	var colorCircle
+	table<string, var> picker
 } file
 
 void function InitProfilesMenu()
@@ -13,19 +12,15 @@ void function InitProfilesMenu()
 	AddMenu( "ProfilesMenu", $"resource/ui/menus/profiles_menu.menu", ShowProfilesMenu )
 	file.menu = GetMenu( "ProfilesMenu" )
 
-	// file.colorCircle = Hud_GetChild( file.menu, "ColorCircle" )
-	// file.colorTile = Hud_GetChild( file.menu, "ColorIndicator" )
-
 	AddMenuEventHandler( file.menu, eUIEvent.MENU_OPEN, OnProfileMenuOpened )
 	AddMenuEventHandler( file.menu, eUIEvent.MENU_CLOSE, OnProfileMenuClosed )
 
-	RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
-	// Hud_SetRotation( file.colorCircle, 90.0 )
+	file.picker = RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
 }
 
 void function OnProfileMenuOpened()
 {
-	Signal( uiGlobal.signalDummy, "ColorPickerRevive" )
+	Signal( uiGlobal.signalDummy, "ColorPickerRevive", { picker = file.picker } )
 
 	thread void function()
 	{

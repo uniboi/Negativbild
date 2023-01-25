@@ -6,7 +6,11 @@
     "ConVars": [
         {
             "Name": "dotres_debug_draw_dimensions",
-            "DefaultValue": "0"
+            "DefaultValue": "0 0 0"
+        },
+        {
+            "Name": "dotres_debug_test_color",
+            "DefaultValue": "0 0 0"
         }
     ],
     "Scripts": [

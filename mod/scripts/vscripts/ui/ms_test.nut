@@ -8,4 +8,5 @@ void function ModSettingsTest()
 
     // AddModSettingsDropDown( "dotres_debug_draw_dimensions", "debug draw dimensions (dotres) - using index", ["Disabled", "Enabled" ], true )
     AddModSettingsColorPicker( "dotres_debug_draw_dimensions", "color picker test" )
+    AddModSettingsColorPicker( "dotres_debug_test_color", "color picker test 2" )
 }
