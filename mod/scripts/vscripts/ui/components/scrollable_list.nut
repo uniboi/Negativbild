@@ -1,10 +1,7 @@
 global function RegisterScrollableList
 global function UpdateScrollableListContent
-global function UpdateScrollableListHeight
 global function ScrollList
-global function _ScrollbarContentListener
-global function Debug1
-global function Debug2
+global function BuildScrollbarContentListener
 
 global struct ScrollbarContent {
     string title
@@ -29,27 +26,13 @@ global struct ScrollableList {
     int fullHeight
 }
 
-global const SCROLLBAR_ITEM_HEIGHT = 50
-const SCROLLABLE_LIST_MAX_ITEMS = 16
+global const int SCROLLBAR_ITEM_HEIGHT = 50
+const int SCROLLABLE_LIST_MAX_ITEMS = 16
 const vector COLOR_INACTIVE = <230, 230, 230>
 const vector COLOR_ACTIVE = <0, 0, 0>
 const vector COLOR_DISABLED = <50, 50, 50>
 
-struct {
-    array<ScrollableList> scrollableLists // todo: remove
-} file
-
-void function Debug1( int h = 50, int listIndex = 0 )
-{
-    UICodeCallback_MouseMovementCapture( Hud_GetChild( file.scrollableLists[ listIndex ].scrollbar, "MouseMovementCapture" ), 0, h )
-}
-
-ScrollableList function Debug2( int idx = 0 )
-{
-    return file.scrollableLists[idx]
-}
-
-ScrollbarContentListener function _ScrollbarContentListener( int event, void functionref( var, ScrollbarContent ) callback )
+ScrollbarContentListener function BuildScrollbarContentListener( int event, void functionref( var, ScrollbarContent ) callback )
 {
     ScrollbarContentListener l
     l.event = event
@@ -57,11 +40,12 @@ ScrollbarContentListener function _ScrollbarContentListener( int event, void fun
     return l
 }
 
+// TODO: implement upscaling from less than 16 initial items
 ScrollableList function RegisterScrollableList( var scrollableList, array<string> items, array<ScrollbarContentListener> listeners )
 {
     int barHeight = Hud_GetHeight( scrollableList )
     int allItemHeight = items.len() * SCROLLBAR_ITEM_HEIGHT
-    float heightPercentage = barHeight.tofloat() / allItemHeight.tofloat()
+    float heightPercentage = float( barHeight ) / float( allItemHeight )
     float cappedHeightPercentage = heightPercentage > 1.0 ? 1.0 : heightPercentage
     int calculatedHeight = int( barHeight * cappedHeightPercentage )
 
@@ -88,13 +72,13 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 
     AddButtonEventHandler( bufferButton, UIE_GET_FOCUS, void function( var button ) : ( sl, buttonsLength ) {
         Hud_Show( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
-        Hud_SetColor( Hud_GetChild( Hud_GetParent( button ), "Label" ), COLOR_ACTIVE.x, COLOR_ACTIVE.y, COLOR_ACTIVE.z, 255 )
+		SetLabelColor( Hud_GetChild( Hud_GetParent( button ), "Label" ), COLOR_ACTIVE )
     } )
 
     AddButtonEventHandler( bufferButton, UIE_LOSE_FOCUS, void function( var button ) : ( sl, buttonsLength ) {
         Hud_Hide( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
         if( !sl.contents[ sl.contentOffset + buttonsLength ].disabled )
-            Hud_SetColor( Hud_GetChild( Hud_GetParent( button ), "Label" ), COLOR_INACTIVE.x, COLOR_INACTIVE.y, COLOR_INACTIVE.z, 255 )
+			SetLabelColor( Hud_GetChild( Hud_GetParent( button ), "Label" ), COLOR_INACTIVE )
     } )
 
     // Build contents
@@ -106,7 +90,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         sc.SetDisabled = void function( bool disabled ) : ( sl, sc, i ) {
             sl.contents[ i ].disabled = disabled
             Hud_SetEnabled( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Button" ), !disabled )
-            Hud_SetColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED.x, COLOR_DISABLED.y, COLOR_DISABLED.z, 255 )
+			SetLabelColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED )
         }
         sl.contents.append( sc )
     }
@@ -130,13 +114,13 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 
         AddButtonEventHandler( button, UIE_GET_FOCUS, void function( var button ) : ( label ) {
             Hud_Show( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
-            Hud_SetColor( label, COLOR_ACTIVE.x, COLOR_ACTIVE.y, COLOR_ACTIVE.z, 255 )
+			SetLabelColor( label, COLOR_ACTIVE )
         } )
 
         AddButtonEventHandler( button, UIE_LOSE_FOCUS, void function( var button ) : ( sl, i, label ) {
             Hud_Hide( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
             if( !sl.contents[ sl.contentOffset + i ].disabled )
-                Hud_SetColor( label, COLOR_INACTIVE.x, COLOR_INACTIVE.y, COLOR_INACTIVE.z, 255 )
+				SetLabelColor( label, COLOR_INACTIVE )
         } )
 
         if( prevNodeButton )
@@ -145,8 +129,6 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
             prevNodeButton = button
         }
     }
-
-    file.scrollableLists.append(sl)
 
     Hud_SetSize( Hud_GetChild( scrollableList, "Frame" ), Hud_GetWidth( scrollableList ), Hud_GetHeight( scrollableList ) )
 
@@ -170,7 +152,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
             var label = Hud_GetChild( node, "Label" )
             Hud_SetY( node, ( i * SCROLLBAR_ITEM_HEIGHT ) - calcHeightModulo )
             Hud_SetText( label, sc.title )
-            SetLabelColor( label, sc.disabled )
+            SetLabelColor( label, sc.disabled ? COLOR_DISABLED : COLOR_INACTIVE )
             Hud_SetEnabled( button, !sc.disabled )
         }
 
@@ -181,7 +163,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
             Hud_SetY( sl.buffer, sl.nodes.len() * SCROLLBAR_ITEM_HEIGHT - calcHeightModulo )
             Hud_Show( sl.buffer )
             Hud_SetEnabled( bufferButton, !sc.disabled )
-            SetLabelColor( bufferLabel, sc.disabled )
+            SetLabelColor( bufferLabel, sc.disabled ? COLOR_DISABLED : COLOR_INACTIVE )
         } else {
             Hud_Hide( sl.buffer )
         }
@@ -201,7 +183,7 @@ void function UpdateScrollableListContent( ScrollableList sl, array<string> cont
 
     int barHeight = height == null ? Hud_GetHeight( sl.component ) : expect int( height )
     int allItemHeight = contents.len() * SCROLLBAR_ITEM_HEIGHT
-    float heightPercentage = barHeight.tofloat() / allItemHeight.tofloat()
+    float heightPercentage = float( barHeight ) / float( allItemHeight )
     float cappedHeightPercentage = heightPercentage > 1.0 ? 1.0 : heightPercentage
     int calculatedHeight = int( barHeight * cappedHeightPercentage )
 
@@ -220,7 +202,7 @@ void function UpdateScrollableListContent( ScrollableList sl, array<string> cont
         sc.SetDisabled = void function( bool disabled ) : ( sl, sc, i ) {
             sl.contents[ i ].disabled = disabled
             Hud_SetEnabled( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Button" ), !disabled )
-            Hud_SetColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED.x, COLOR_DISABLED.y, COLOR_DISABLED.z, 255 )
+			SetLabelColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED )
         }
         sl.contents.append( sc )
     }
@@ -271,20 +253,9 @@ void function RegisterAllCallbacksOnNode( var button, array<ScrollbarContentList
     }
 }
 
-// UPDATE CONTENTS AFTERWARDS
-void function UpdateScrollableListHeight( ScrollableList sl, int height )
+void function SetLabelColor( var label, vector c )
 {
-    Hud_SetHeight( sl.component, height )
-    Hud_SetHeight( Hud_GetChild( sl.component, "Frame" ), height )
-    SetScrollbarComponentHeight( sl.scrollbar, height )
-}
-
-void function SetLabelColor( var label, bool disabled )
-{
-    if( disabled )
-        Hud_SetColor( label, COLOR_DISABLED.x, COLOR_DISABLED.y, COLOR_DISABLED.z, 255 )
-    else
-        Hud_SetColor( label, COLOR_INACTIVE.x, COLOR_INACTIVE.y, COLOR_INACTIVE.z, 255 )
+    Hud_SetColor( label, c.x, c.y, c.z, 255 )
 }
 
 void function ScrollList( ScrollableList sl, int height )
