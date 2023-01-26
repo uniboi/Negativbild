@@ -28,9 +28,9 @@ global struct ScrollableList {
 
 global const int SCROLLBAR_ITEM_HEIGHT = 50
 const int SCROLLABLE_LIST_MAX_ITEMS = 16
-const vector COLOR_INACTIVE = <230, 230, 230>
-const vector COLOR_ACTIVE = <0, 0, 0>
-const vector COLOR_DISABLED = <50, 50, 50>
+const vector COLOR_INACTIVE = < 230, 230, 230 >
+const vector COLOR_ACTIVE = < 0, 0, 0 >
+const vector COLOR_DISABLED = < 50, 50, 50> 
 
 ScrollbarContentListener function BuildScrollbarContentListener( int event, void functionref( var, ScrollbarContent ) callback )
 {
@@ -55,7 +55,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
     sl.buffer = Hud_GetChild( scrollableList, "ItemBuffer" )
     sl.frame = Hud_GetChild( scrollableList, "Frame" )
     sl.fullHeight = allItemHeight
-
+ 
     // TODO: LIMIT MAX HEIGHT TO 800 (16 * 50 = Buttonslength - extra button * button height )
 
     int buttonsLength = items.len() > SCROLLABLE_LIST_MAX_ITEMS ? SCROLLABLE_LIST_MAX_ITEMS : items.len()
@@ -217,7 +217,7 @@ void function UpdateScrollableListContent( ScrollableList sl, array<string> cont
     else
         for( int i; i < buttonsLength; i++ )
         {
-            sl.nodes.append( Hud_GetChild( sl.component, format( "Item%i", i     ) ) )
+            sl.nodes.append( Hud_GetChild( sl.component, format( "Item%i", i ) ) )
         }
 
     // reset nodes

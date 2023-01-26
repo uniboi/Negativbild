@@ -1,4 +1,4 @@
-untyped
+untyped // required becaues of file.tooltips indexing
 
 global function RegisterToolTip
 global function AddTooltipToElement
@@ -7,8 +7,8 @@ struct {
     table<var, var> tooltips
 } file
 
-const APPROX_AVERAGE_CHAR_WIDTH = 12.5
-const TOOLTIP_MARGIN = 5.0
+const float APPROX_AVERAGE_CHAR_WIDTH = 12.5
+const float TOOLTIP_MARGIN = 5.0
 
 void function RegisterToolTip( var menu, var tooltip )
 {
@@ -20,7 +20,7 @@ void function AddTooltipToElement( var elem, string tooltipText, int width = 0 )
     Hud_AddEventHandler( elem, UIE_GET_FOCUS,
         var function( var focused ) : ( tooltipText, width )
         {
-            if( !(GetActiveMenu() in file.tooltips) )
+            if( !( GetActiveMenu() in file.tooltips ) )
                 return
 
             var tooltip = file.tooltips[ GetActiveMenu() ]
