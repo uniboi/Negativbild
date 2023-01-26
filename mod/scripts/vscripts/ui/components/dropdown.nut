@@ -33,7 +33,7 @@ void function InitDropDownMenu()
 
 	file.sl = RegisterScrollableList( Hud_GetChild( menu, "OptionsList" ), [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" ],
 		[
-			_ScrollbarContentListener( UIE_CLICK,
+			BuildScrollbarContentListener( UIE_CLICK,
 				void function( var button, ScrollbarContent sc )
 				{
 					Signal( uiGlobal.signalDummy, "DropDownSelected", { title = sc.title, index = sc.contentIndex } )
@@ -64,11 +64,6 @@ void function OnDropDown_NavigateBack()
     CloseSubmenu()
 }
 
-// void function RegisterDropDownMenu( var opener )
-// {
-//     Hud_AddEventHandler( opener, UIE_CLICK, OpenDropDown )
-// }
-
 void function OpenDropDown_Internal( array<string> contents, int[2] functionref( var ) positionCallback )
 {
     OpenDropDownSubmenu( GetMenu( "DropDownMenu" ), positionCallback )
@@ -79,7 +74,6 @@ void function OpenDropDown_Internal( array<string> contents, int[2] functionref(
     {
         height = MAX_LIST_NODES * SCROLLBAR_ITEM_HEIGHT
     }
-    // UpdateScrollableListHeight( file.sl, 250 )
     UpdateScrollableListContent( file.sl, contents, height )
     Hud_SetHeight( Hud_GetChild( GetMenu( "DropDownMenu" ), "Frame" ), height )
 }
@@ -130,7 +124,6 @@ void function OpenDropDownSubmenu( var menu, int[2] functionref( var ) positionC
 		if ( uiGlobal.activeMenu == menu )
 			return
 	}
-
 
 	uiGlobal.menuStack.push( menu )
 	uiGlobal.activeMenu = menu

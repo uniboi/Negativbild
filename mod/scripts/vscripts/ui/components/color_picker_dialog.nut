@@ -1,6 +1,5 @@
 global function ColorPickerDialog_Init
 global function OpenColorPickerDialog
-global function OpenColorPickerDialogCalc
 
 struct {
     table<string, var> picker
@@ -32,7 +31,7 @@ void function OnDialog_Open()
 {
     Signal( uiGlobal.signalDummy, "ColorPickerRevive", { picker = file.picker } )
     array<string> split = split( GetConVarString( file.conVar ), " " )
-    Hud_SetColor( Hud_GetChild( file.menu, "LastColorIndicator" ), float( split[0]), float( split[1]), float( split[2] ) )
+    Hud_SetColor( Hud_GetChild( file.menu, "LastColorIndicator" ), float( split[0] ), float( split[1] ), float( split[2] ) )
     Hud_SetColor( file.picker.indicator, 255, 255, 255 )
 }
 
@@ -48,7 +47,7 @@ void function OnScreen_BGActivate( var button )
 
 void function SetConVarV()
 {
-    vector ornull rgb = expect vector ornull( WaitSignal( uiGlobal.signalDummy, "ColorPickerSelected" )["color"] )
+    vector ornull rgb = expect vector ornull( WaitSignal( uiGlobal.signalDummy, "ColorPickerSelected" )[ "color" ] )
     if(rgb == null)
         return
     expect vector( rgb )
@@ -61,12 +60,6 @@ void function OpenColorPickerDialog( string conVar )
     file.picker.lastColor = null
     thread SetConVarV()
 	OpenColorPickerDialog_Internal(DefaultSubmenuPosition )
-}
-
-// Needed because default params need to be const and it's impossible to cast ornull to a functionref
-void function OpenColorPickerDialogCalc( int[2] functionref( var ) positionCallback )
-{
-	OpenColorPickerDialog_Internal( positionCallback )
 }
 
 void function OpenColorPickerDialog_Internal( int[2] functionref( var ) positionCallback )

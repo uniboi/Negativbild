@@ -1,6 +1,6 @@
 global function RegisterScrollableListItem
 
-const PLAIN_RUI_BUTTON_LEFT_OFFSET = 60
+const int PLAIN_RUI_BUTTON_LEFT_OFFSET = 60
 
 void function RegisterScrollableListItem( var item, int width, int height )
 {

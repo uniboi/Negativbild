@@ -42,13 +42,13 @@ void function ProfilesAddFooter()
 	ScrollableList sl1 = RegisterScrollableList( Hud_GetChild( file.menu, "TestList" ), [
 		"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],
 		[
-			_ScrollbarContentListener( UIE_GET_FOCUS,
+			BuildScrollbarContentListener( UIE_GET_FOCUS,
 				void function( var button, ScrollbarContent sc )
 				{
 					printt( "FOCUS: " + sc.title )
 				}
 			),
-			_ScrollbarContentListener( UIE_CLICK,
+			BuildScrollbarContentListener( UIE_CLICK,
 				void function( var button, ScrollbarContent sc )
 				{
 					printt( "CLICK: " + sc.title )
@@ -58,7 +58,7 @@ void function ProfilesAddFooter()
 	)
 	ScrollableList sl2 = RegisterScrollableList( Hud_GetChild( file.menu, "TestList2" ), [
 		"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40"],
-		[_ScrollbarContentListener( UIE_CLICK,
+		[BuildScrollbarContentListener( UIE_CLICK,
 			void function( var button, ScrollbarContent sc )
 			{
 				sc.SetDisabled( true )
