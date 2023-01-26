@@ -15,6 +15,18 @@ resource/ui/menus/panels/internal/scrollable_list_items.res
 		scaleImage	1
 	}
 
+	UpDummy
+	{
+		ControlName	Label
+		labelText	""
+	}
+
+	DownDummy
+	{
+		ControlName	Label
+		labelText	""
+	}
+
 	Label
 	{
 		ControlName		Label
@@ -37,5 +49,8 @@ resource/ui/menus/panels/internal/scrollable_list_items.res
 		labelText		""
 
 		tall	50
+
+		navUp	UpDummy
+		navDown	DownDummy
 	}
 }

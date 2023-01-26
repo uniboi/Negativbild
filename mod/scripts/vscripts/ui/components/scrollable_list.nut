@@ -30,7 +30,7 @@ global const int SCROLLBAR_ITEM_HEIGHT = 50
 const int SCROLLABLE_LIST_MAX_ITEMS = 16
 const vector COLOR_INACTIVE = < 230, 230, 230 >
 const vector COLOR_ACTIVE = < 0, 0, 0 >
-const vector COLOR_DISABLED = < 50, 50, 50> 
+const vector COLOR_DISABLED = < 50, 50, 50>
 
 ScrollbarContentListener function BuildScrollbarContentListener( int event, void functionref( var, ScrollbarContent ) callback )
 {
@@ -95,47 +95,81 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         sl.contents.append( sc )
     }
 
+	// Preset all nodes
+	for( int i; i < SCROLLABLE_LIST_MAX_ITEMS; i++ )
+	{
+		var item = Hud_GetChild( scrollableList, format( "Item%i", i ) )
+        var button = Hud_GetChild( item, "Button" )
+        var label = Hud_GetChild( item, "Label" )
+		var frame = Hud_GetChild( item, "Frame" )
+		var upDummy = Hud_GetChild( item, "UpDummy" )
+		var downDummy = Hud_GetChild( item, "DownDummy" )
+
+		RegisterScrollableListItem( item, itemWidth, SCROLLBAR_ITEM_HEIGHT )
+
+        RegisterAllCallbacksOnNode( button, listeners, sl, i )
+
+        AddButtonEventHandler( button, UIE_GET_FOCUS, void function( var button ) : ( frame, label ) {
+            Hud_Show( frame )
+			SetLabelColor( label, COLOR_ACTIVE )
+        } )
+
+        AddButtonEventHandler( button, UIE_LOSE_FOCUS, void function( var button ) : ( sl, i, frame,label ) {
+            Hud_Hide( frame )
+            if( !sl.contents[ sl.contentOffset + i ].disabled )
+				SetLabelColor( label, COLOR_INACTIVE )
+        } )
+
+		var nextNode = Hud_GetChild( scrollableList, format( "Item%i", i + 1 < SCROLLABLE_LIST_MAX_ITEMS ? i + 1 : 0 ) )
+		var previousNode = Hud_GetChild( scrollableList, format( "Item%i", i - 1 >= 0 ? i - 1 : SCROLLABLE_LIST_MAX_ITEMS - 1 ) )
+		var nextNodeButton = Hud_GetChild( nextNode, "Button" )
+		var prevNodeButton = Hud_GetChild( previousNode, "Button" )
+
+		AddButtonEventHandler( downDummy, UIE_GET_FOCUS,
+			void function( var d ) : ( sl, i, nextNodeButton, button )
+			{
+				if( i >= sl.nodes.len() - 1 )
+				{
+					ScrollList( sl, SCROLLBAR_ITEM_HEIGHT - 10 ) // don't ask why -10 I don't know
+					Hud_SetFocused( button )
+				}
+				else
+				{
+					Hud_SetFocused( nextNodeButton )
+				}
+			}
+		)
+
+		AddButtonEventHandler( upDummy, UIE_GET_FOCUS,
+			void function( var d ) : ( sl, i, prevNodeButton, button )
+			{
+				if( i <= 0 )
+				{
+					ScrollList( sl, -( SCROLLBAR_ITEM_HEIGHT - 10 ) )
+					Hud_SetFocused( button )
+				}
+				else
+				{
+					Hud_SetFocused( prevNodeButton )
+				}
+			}
+		)
+	}
+
     var prevNodeButton = null
 
     // Build nodes
     for( int i; i < buttonsLength; i++ )
     {
-        // int itemIndex = SCROLLABLE_LIST_MAX_ITEMS - buttonsLength + i
         var item = Hud_GetChild( scrollableList, format( "Item%i", i ) )
         var button = Hud_GetChild( item, "Button" )
         var label = Hud_GetChild( item, "Label" )
+
         sl.nodes.append( item )
-        RegisterScrollableListItem( item, itemWidth, SCROLLBAR_ITEM_HEIGHT )
         Hud_SetY( item, SCROLLBAR_ITEM_HEIGHT * i )
         Hud_SetText( label, sl.contents[ i ].title )
         Hud_Show( item )
-
-        RegisterAllCallbacksOnNode( button, listeners, sl, i )
-
-        AddButtonEventHandler( button, UIE_GET_FOCUS, void function( var button ) : ( label ) {
-            Hud_Show( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
-			SetLabelColor( label, COLOR_ACTIVE )
-        } )
-
-        AddButtonEventHandler( button, UIE_LOSE_FOCUS, void function( var button ) : ( sl, i, label ) {
-            Hud_Hide( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
-            if( !sl.contents[ sl.contentOffset + i ].disabled )
-				SetLabelColor( label, COLOR_INACTIVE )
-        } )
-
-        if( prevNodeButton )
-        {
-            Hud_SetNavDown( prevNodeButton, button )
-            prevNodeButton = button
-        }
     }
-
-	// Register remaining unused nodes
-	for( int i = buttonsLength; i < SCROLLABLE_LIST_MAX_ITEMS; i++ )
-	{
-		var item = Hud_GetChild( scrollableList, format( "Item%i", i ) )
-		RegisterScrollableListItem( item, itemWidth, SCROLLBAR_ITEM_HEIGHT )
-	}
 
     Hud_SetSize( Hud_GetChild( scrollableList, "Frame" ), Hud_GetWidth( scrollableList ), Hud_GetHeight( scrollableList ) )
 
