@@ -130,6 +130,13 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         }
     }
 
+	// Register remaining unused nodes
+	for( int i = buttonsLength; i < SCROLLABLE_LIST_MAX_ITEMS; i++ )
+	{
+		var item = Hud_GetChild( scrollableList, format( "Item%i", i ) )
+		RegisterScrollableListItem( item, itemWidth, SCROLLBAR_ITEM_HEIGHT )
+	}
+
     Hud_SetSize( Hud_GetChild( scrollableList, "Frame" ), Hud_GetWidth( scrollableList ), Hud_GetHeight( scrollableList ) )
 
     RegisterScrollbar( sl.scrollbar, void function( int x, int y ) : ( scrollableList, sl, bufferButton, bufferLabel, buttonsLength ) {
