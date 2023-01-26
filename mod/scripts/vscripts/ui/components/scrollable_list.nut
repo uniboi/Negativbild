@@ -68,7 +68,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
     var bufferButton = Hud_GetChild( sl.buffer, "Button" )
     var bufferLabel = Hud_GetChild( sl.buffer, "Label" )
     RegisterScrollableListItem( sl.buffer, itemWidth, SCROLLBAR_ITEM_HEIGHT )
-    RegisterAllCallbacksOnNode( bufferButton, listeners, sl, buttonsLength )
+    RegisterAllCallbacksOnBufferNode( bufferButton, listeners, sl )
 
     AddButtonEventHandler( bufferButton, UIE_GET_FOCUS, void function( var button ) : ( sl, buttonsLength ) {
         Hud_Show( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
@@ -77,7 +77,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 
     AddButtonEventHandler( bufferButton, UIE_LOSE_FOCUS, void function( var button ) : ( sl, buttonsLength ) {
         Hud_Hide( Hud_GetChild( Hud_GetParent( button ), "Frame" ) )
-        if( !sl.contents[ sl.contentOffset + buttonsLength ].disabled )
+        if( !sl.contents[ sl.contentOffset + sl.nodes.len() ].disabled )
 			SetLabelColor( Hud_GetChild( Hud_GetParent( button ), "Label" ), COLOR_INACTIVE )
     } )
 
@@ -88,9 +88,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         sc.title = title
         sc.contentIndex = i
         sc.SetDisabled = void function( bool disabled ) : ( sl, sc, i ) {
-            sl.contents[ i ].disabled = disabled
-            Hud_SetEnabled( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Button" ), !disabled )
-			SetLabelColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED )
+			SetNodeDisabled_Internal( sl, i, disabled )
         }
         sl.contents.append( sc )
     }
@@ -241,9 +239,7 @@ void function UpdateScrollableListContent( ScrollableList sl, array<string> cont
         sc.title = title
         sc.contentIndex = i
         sc.SetDisabled = void function( bool disabled ) : ( sl, sc, i ) {
-            sl.contents[ i ].disabled = disabled
-            Hud_SetEnabled( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Button" ), !disabled )
-			SetLabelColor( Hud_GetChild( sl.nodes[ abs( sl.contentOffset - i ) ], "Label" ), COLOR_DISABLED )
+			SetNodeDisabled_Internal( sl, i, disabled )
         }
         sl.contents.append( sc )
     }
@@ -294,6 +290,19 @@ void function RegisterAllCallbacksOnNode( var button, array<ScrollbarContentList
     }
 }
 
+void function RegisterAllCallbacksOnBufferNode( var button, array<ScrollbarContentListener> listeners, ScrollableList sl )
+{
+    foreach( ScrollbarContentListener listener in listeners )
+    {
+        AddButtonEventHandler( button, listener.event,
+            void function( var button ) : ( sl, listener )
+            {
+                listener.callback( button, sl.contents[ sl.contentOffset + sl.nodes.len() ] )
+            }
+        )
+    }
+}
+
 void function SetLabelColor( var label, vector c )
 {
     Hud_SetColor( label, c.x, c.y, c.z, 255 )
@@ -302,4 +311,17 @@ void function SetLabelColor( var label, vector c )
 void function ScrollList( ScrollableList sl, int height )
 {
     UICodeCallback_MouseMovementCapture( Hud_GetChild( sl.scrollbar, "MouseMovementCapture" ), 0, height )
+}
+
+void function SetNodeDisabled_Internal( ScrollableList sl, int i, bool disabled )
+{
+	sl.contents[ i ].disabled = disabled
+	int wrap = abs( sl.contentOffset - i )
+	var node
+	if( wrap == sl.nodes.len() )
+		node = sl.buffer
+	else
+		node = sl.nodes[ wrap ]
+	Hud_SetEnabled( Hud_GetChild( node, "Button" ), !disabled )
+	SetLabelColor( Hud_GetChild( node, "Label" ), COLOR_DISABLED )
 }

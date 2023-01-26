@@ -61,6 +61,7 @@ void function ProfilesAddFooter()
 		[BuildScrollbarContentListener( UIE_CLICK,
 			void function( var button, ScrollbarContent sc )
 			{
+				printt( sc.title )
 				sc.SetDisabled( true )
 			}
 		)]
