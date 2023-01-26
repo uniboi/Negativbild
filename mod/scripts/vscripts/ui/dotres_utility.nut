@@ -46,7 +46,11 @@ void function AddModSettingsColorPicker( string conVar, string buttonLabel )
     )
 }
 
+// TODO: is this right? idk
 void function Hud_SetAbsPos( var elem, int x, int y )
 {
-    // TODO
+    array pos = expect array( Hud_GetAbsPos( elem ) )
+	int px = expect int( pos[0] )
+	int py = expect int( pos[1] )
+	Hud_SetPos( elem, px + ( x - px ), py + ( y - py ) )
 }
