@@ -1,7 +1,7 @@
 {
     "Name": "Negativbild",
     "Description": "A UI Library that adds various QOL features.",
-    "LoadPriority": 0,
+    "LoadPriority": 1,
     "Version": "0.0.1",
     "ConVars": [
         {
