@@ -1,5 +1,4 @@
 global function RegisterScrollbar
-global function SetScrollbarComponentHeight
 global function SetScrollbarComponentContentHeight
 
 void function RegisterScrollbar( var scrollbar, void functionref( int x, int y ) callback )
@@ -23,11 +22,6 @@ void function RegisterScrollbar( var scrollbar, void functionref( int x, int y )
 
         callback( x, movedY )
     } )
-}
-
-void function SetScrollbarComponentHeight( var component, int height )
-{
-    Hud_SetHeight( component, height )
 }
 
 void function SetScrollbarComponentContentHeight( var component, int height )

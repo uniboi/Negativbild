@@ -210,7 +210,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
         }
     } )
     
-    SetScrollbarComponentHeight( sl.scrollbar, barHeight )
+    Hud_SetHeight( sl.scrollbar, barHeight )
     SetScrollbarComponentContentHeight( sl.scrollbar, calculatedHeight )
 
     return sl
@@ -273,7 +273,7 @@ void function UpdateScrollableListContent( ScrollableList sl, array<string> cont
     if( height != null )
     {
         expect int( height )
-        SetScrollbarComponentHeight( sl.scrollbar, height )
+        Hud_SetHeight( sl.scrollbar, height )
         Hud_SetHeight( Hud_GetChild( sl.component, "Frame" ), height )
         Hud_SetHeight( sl.component, height )
     }
