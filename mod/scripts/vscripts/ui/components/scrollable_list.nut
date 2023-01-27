@@ -51,7 +51,7 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 
     ScrollableList sl
     sl.component = scrollableList
-    sl.scrollbar = Hud_GetChild( scrollableList, "Scrollbar" )
+    sl.scrollbar = Hud_GetChild( scrollableList, "SLScrollbar" )
     sl.buffer = Hud_GetChild( scrollableList, "ItemBuffer" )
     sl.frame = Hud_GetChild( scrollableList, "Frame" )
     sl.fullHeight = allItemHeight

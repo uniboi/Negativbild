@@ -15,7 +15,7 @@ resource/ui/menus/panels/scrollable_list.res
 		scaleImage	1
 	}
 
-	Scrollbar
+	SLScrollbar
 	{
 		ControlName			CNestedPanel
 
