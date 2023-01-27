@@ -20,7 +20,6 @@ global struct ScrollableList {
     var component
     var scrollbar
     var buffer
-    var frame
     array<ScrollbarContent> contents
     int contentOffset = 0
     int fullHeight
@@ -53,7 +52,6 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
     sl.component = scrollableList
     sl.scrollbar = Hud_GetChild( scrollableList, "SLScrollbar" )
     sl.buffer = Hud_GetChild( scrollableList, "ItemBuffer" )
-    sl.frame = Hud_GetChild( scrollableList, "Frame" )
     sl.fullHeight = allItemHeight
  
     // TODO: LIMIT MAX HEIGHT TO 800 (16 * 50 = Buttonslength - extra button * button height )
