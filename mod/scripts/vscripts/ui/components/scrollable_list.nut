@@ -128,7 +128,8 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 			{
 				if( i >= sl.nodes.len() - 1 )
 				{
-					ScrollList( sl, SCROLLBAR_ITEM_HEIGHT - 10 ) // don't ask why -10 I don't know
+					var cpt = Hud_GetChild( sl.scrollbar, "MouseMovementCapture" )
+					ScrollList( sl, int( floor( float( Hud_GetHeight( cpt ) ) / float( sl.nodes.len() ) + 0.5 ) ) )
 					Hud_SetFocused( button )
 				}
 				else
@@ -143,7 +144,8 @@ ScrollableList function RegisterScrollableList( var scrollableList, array<string
 			{
 				if( i <= 0 )
 				{
-					ScrollList( sl, -( SCROLLBAR_ITEM_HEIGHT - 10 ) )
+					var cpt = Hud_GetChild( sl.scrollbar, "MouseMovementCapture" )
+					ScrollList( sl, -int( floor( float( Hud_GetHeight( cpt ) ) / float( sl.nodes.len() ) + 0.5 ) ) )
 					Hud_SetFocused( button )
 				}
 				else
