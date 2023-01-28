@@ -66,7 +66,7 @@ void function SetConVarV()
     SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
 }
 
-void function SetConVarLive()
+void function SetConVarLive( bool update )
 {
 	EndSignal( uiGlobal.signalDummy, "ColorPickerSelected" )
 	while( true )
@@ -75,7 +75,8 @@ void function SetConVarLive()
 		if( rgb == null )
 			continue
 		expect vector( rgb )
-		SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
+		if( update )
+			SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
 	}
 }
 
@@ -87,8 +88,8 @@ void function OpenColorPickerDialog( string conVar, bool liveUpdate = false, boo
 	if( update )
     	thread SetConVarV()
 	if( liveUpdate )
-		thread SetConVarLive()
-	OpenColorPickerDialog_Internal(DefaultSubmenuPosition )
+		thread SetConVarLive( update )
+	OpenColorPickerDialog_Internal( DefaultSubmenuPosition )
 }
 
 void function OpenColorPickerDialog_Internal( int[2] functionref( var ) positionCallback )
