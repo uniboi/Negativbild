@@ -65,7 +65,7 @@ void function AddModSettingsDropDown( string conVar, string buttonLabel, array<s
     )
 }
 
-void function AddModSettingsColorPicker( string conVar, string buttonLabel )
+void function AddModSettingsColorPicker( string conVar, string buttonLabel, bool liveUpdate = false )
 {
     AddModSettingsButton( buttonLabel,
         void function() : ( conVar )

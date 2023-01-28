@@ -5,6 +5,7 @@ struct {
     table<string, var> picker
     string conVar
     var menu
+	bool reset
 } file
 
 void function ColorPickerDialog_Init()
@@ -14,6 +15,8 @@ void function ColorPickerDialog_Init()
 
 void function InitColorPickerMenu()
 {
+	RegisterSignal( "ColorPickerDialogReset" )
+
     file.menu = GetMenu( "ColorPickerMenu" )
 
 	AddMenuEventHandler( file.menu, eUIEvent.MENU_OPEN, OnDialog_Open )
@@ -22,7 +25,9 @@ void function InitColorPickerMenu()
 	var screen = Hud_GetChild( file.menu, "Screen" )
 	var rui = Hud_GetRui( screen )
 	RuiSetFloat( rui, "basicImageAlpha", 0.0 )
+
 	Hud_AddEventHandler( screen, UIE_CLICK, OnScreen_BGActivate )
+	Hud_AddEventHandler( Hud_GetChild( file.menu, "ResetButton" ), UIE_CLICK, OnResetButtonPressed )
 
     file.picker = RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
 }
@@ -45,6 +50,13 @@ void function OnScreen_BGActivate( var button )
     CloseSubmenu()
 }
 
+void function OnResetButtonPressed( var button )
+{
+	Signal( uiGlobal.signalDummy, "ColorPickerDialogReset" )
+	if( file.reset )
+		SetConVarToDefault( file.conVar )
+}
+
 void function SetConVarV()
 {
     vector ornull rgb = expect vector ornull( WaitSignal( uiGlobal.signalDummy, "ColorPickerSelected" )[ "color" ] )
@@ -54,11 +66,28 @@ void function SetConVarV()
     SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
 }
 
-void function OpenColorPickerDialog( string conVar )
+void function SetConVarLive()
+{
+	EndSignal( uiGlobal.signalDummy, "ColorPickerSelected" )
+	while( true )
+	{
+		vector ornull rgb = expect vector ornull( WaitSignal( uiGlobal.signalDummy, "ColorPickerLiveUpdate" )[ "color" ] )
+		if( rgb == null )
+			continue
+		expect vector( rgb )
+		SetConVarString( file.conVar, format( "%.2f %.2f %.2f", rgb.x, rgb.y, rgb.z ) )
+	}
+}
+
+void function OpenColorPickerDialog( string conVar, bool liveUpdate = false, bool update = true, bool reset = false )
 {
     file.conVar = conVar
     file.picker.lastColor = null
-    thread SetConVarV()
+	file.reset = reset
+	if( update )
+    	thread SetConVarV()
+	if( liveUpdate )
+		thread SetConVarLive()
 	OpenColorPickerDialog_Internal(DefaultSubmenuPosition )
 }
 

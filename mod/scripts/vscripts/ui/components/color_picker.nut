@@ -10,6 +10,7 @@ void function ColorPickers_Init()
     RegisterSignal( "ColorPickerSelected" )
     RegisterSignal( "ColorPickerKill" )
     RegisterSignal( "ColorPickerRevive" )
+	RegisterSignal( "ColorPickerLiveUpdate" )
 	RegisterButtonPressedCallback( MOUSE_LEFT , OnClick )
 }
 
@@ -79,6 +80,7 @@ void function CursorPositionChecker_Threaded( table observedPicker )
 
                 Hud_SetColor( observedPicker[ "indicator" ], rgb.x, rgb.y, rgb.z )
                 observedPicker[ "lastColor" ] <- rgb
+				Signal( uiGlobal.signalDummy, "ColorPickerLiveUpdate", { color = rgb } )
             }
         }
         WaitFrame()
