@@ -17,11 +17,20 @@ void function ColorPickers_Init()
 void function OnClick( var button )
 {
     table ornull picker = file.lastPicker
-    if( picker == null )
+	vector ornull p = NSGetCursorPosition()
+    if( picker == null || p == null )
         return
     expect table( picker )
+	expect vector( p )
 
-    Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = picker.lastColor } )
+    var circle = expect table( file.lastPicker )[ "circle" ]
+	int circleAbsX = Hud_GetAbsX( circle )
+	int circleAbsY = Hud_GetAbsY( circle )
+	int circleRadius = Hud_GetWidth( circle ) / 2
+	vector origin = < circleAbsX + circleRadius, circleAbsY + circleRadius, 0 >
+
+	if( PointOnCircle( p, origin, circleRadius ) )
+    	Signal( uiGlobal.signalDummy, "ColorPickerSelected", { color = expect vector( picker.lastColor ) } )
 }
 
 table<string, var> function RegisterColorPicker( var elem )
@@ -69,7 +78,7 @@ void function CursorPositionChecker_Threaded( table observedPicker )
 	        int circleRadius = circleDiameter / 2
             vector origin = < circleAbsX + circleRadius, circleAbsY + circleRadius, 0 >
 
-            if( Length2DSqr( origin - p ) < circleRadius * circleRadius )
+            if( PointOnCircle( p, origin, circleRadius ) )
             {
                 vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
                 vector rp = p - circleCenter
@@ -85,6 +94,11 @@ void function CursorPositionChecker_Threaded( table observedPicker )
         }
         WaitFrame()
     }
+}
+
+bool function PointOnCircle( vector point, vector origin, int radius )
+{
+	return Length2DSqr( origin - point ) < radius * radius
 }
 
 vector function PositionToRGB( vector pos )
