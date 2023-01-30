@@ -177,9 +177,16 @@ To enable a color picker, signal `ColorPickerRevive` (for example when opening a
 
 The color picker dialog changes the value of a ConVar on select. It does not close on it's own.
 
-- `void function OpenColorPickerDialog( string conVar )`
+- `void function OpenColorPickerDialog( string conVar, bool liveUpdate = false, bool update = true, bool reset = false )`
 
-  Open a color picker dialog at the cursor position
+  Open a color picker dialog at the cursor position.
+
+  #### Parameters
+
+  - `conVar` - The convar that the value will be saved to
+  - `liveUpdate` - If `true`, `ColorPickerLiveUpdate` will be triggered every frame the cursor hovers over a color with the color in the color in the `color` slot of the result.
+  - `update` - If `true`, the color will be saved to the given ConVar on click and live update, if enabled
+  - `reset` - If `true`, `conVar` will be resetted to it's default value. The Reset button emits the `ColorPickerDialogReset` signal that you can use for custom reset logic. 
 
 #### Example
 
