@@ -110,7 +110,11 @@ int[2] function DefaultSubmenuPosition( var frame )
 			p[0] = screenSize[0] - Hud_GetWidth( frame )
 		else
 			p[0] = int( c.x )
-		p[1] = int( c.y )
+
+		if( c.y + Hud_GetHeight( frame ) > screenSize[1] )
+			p[1] = screenSize[1] - Hud_GetHeight( frame )
+		else
+			p[1] = int( c.y )
 	}
 	return p
 }
