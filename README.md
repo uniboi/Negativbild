@@ -201,7 +201,7 @@ thread void function()
 
 ### Mod Settings Utilities
 
-- `void function AddModSettingsDropDown( string conVar, string buttonLabel, array<string> options, bool useIndex = false )`
+- `void function ModSettings_AddDropDown( string conVar, string buttonLabel, array<string> options, bool useIndex = false )`
 
   Adds a button to the last settings category that opens a DropDown on click.
 
@@ -209,14 +209,14 @@ thread void function()
 
   ```js
   // an example to use the dropdown instead of the common Mod Settings enum
-  AddModSettingsDropDown("cv_feature_enabled", "Some Feature Enabled", [
+  ModSettings_AddDropDown("cv_feature_enabled", "Some Feature Enabled", [
     "Disabled",
     "Enabled",
     true,
   ]);
   ```
 
-- `void function AddModSettingsColorPicker( string conVar, string buttonLabel )`
+- `void function ModSettings_AddColorPicker( string conVar, string buttonLabel )`
 
   Adds a button to the last settings category that opens a Color Picker Dialog when clicked.
 

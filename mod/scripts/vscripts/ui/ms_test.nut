@@ -31,7 +31,7 @@ void function ModSettingsTest()
     AddConVarSetting( "dotres_debug_draw_dimensions", "dotres debug", "float3" )
     AddConVarSetting( "dotres_debug_draw_dimensions", "dotres debug", "float3" )
 
-    // AddModSettingsDropDown( "dotres_debug_draw_dimensions", "debug draw dimensions (dotres) - using index", ["Disabled", "Enabled" ], true )
-    AddModSettingsColorPicker( "dotres_debug_draw_dimensions", "color picker test" )
-    AddModSettingsColorPicker( "dotres_debug_test_color", "color picker test 2" )
+    // ModSettings_AddDropDown( "dotres_debug_draw_dimensions", "debug draw dimensions (dotres) - using index", ["Disabled", "Enabled" ], true )
+    ModSettings_AddColorPicker( "dotres_debug_draw_dimensions", "color picker test" )
+    ModSettings_AddColorPicker( "dotres_debug_test_color", "color picker test 2" )
 }

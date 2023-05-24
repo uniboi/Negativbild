@@ -44,9 +44,9 @@ void function Negativbild_Init()
 	)
 }
 
-void function AddModSettingsDropDown( string conVar, string buttonLabel, array<string> options, bool useIndex = false )
+void function ModSettings_AddDropDown( string conVar, string buttonLabel, array<string> options, bool useIndex = false )
 {
-    AddModSettingsButton( buttonLabel, 
+    ModSettings_AddButton( buttonLabel, 
         void function() : ( options, conVar, useIndex )
         {
             OpenDropDown( options )
@@ -65,9 +65,9 @@ void function AddModSettingsDropDown( string conVar, string buttonLabel, array<s
     )
 }
 
-void function AddModSettingsColorPicker( string conVar, string buttonLabel, bool liveUpdate = false )
+void function ModSettings_AddColorPicker( string conVar, string buttonLabel, bool liveUpdate = false )
 {
-    AddModSettingsButton( buttonLabel,
+    ModSettings_AddButton( buttonLabel,
         void function() : ( conVar )
         {
             OpenColorPickerDialog( conVar )
