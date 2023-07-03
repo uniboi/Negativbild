@@ -36,8 +36,16 @@ void function OnDialog_Open()
 {
     Signal( uiGlobal.signalDummy, "ColorPickerRevive", { picker = file.picker } )
     array<string> split = split( GetConVarString( file.conVar ), " " )
-    Hud_SetColor( Hud_GetChild( file.menu, "LastColorIndicator" ), float( split[0] ), float( split[1] ), float( split[2] ) )
-    Hud_SetColor( file.picker.indicator, 255, 255, 255 )
+
+		if( split.len() >= 3 )
+		{
+			Hud_SetColor( Hud_GetChild( file.menu, "LastColorIndicator" ), 255 * float( split[0] ), 255 * float( split[1] ), 266 * float( split[2] ) )
+			Hud_SetColor( file.picker.indicator, 255 * float( split[0] ), 255 * float( split[1] ), 266 * float( split[2] ) )
+		}
+		else
+		{
+			Hud_SetColor( file.picker.indicator, 255, 255, 255 )
+		}
 }
 
 void function OnDialog_Close()
