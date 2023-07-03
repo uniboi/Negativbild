@@ -1,17 +1,17 @@
 {
     "Name": "Negativbild",
-    "Description": "A UI Library that adds various QOL features.",
+    "Description": "An UI library that adds some developer utilies like color pickers and dropdown menus",
     "LoadPriority": 1,
-    "Version": "0.0.1",
+    "Version": "1.0.0",
     "ConVars": [
-        {
-            "Name": "dotres_debug_draw_dimensions",
-            "DefaultValue": "0 0 0"
-        },
-        {
-            "Name": "dotres_debug_test_color",
-            "DefaultValue": "0 0 0"
-        }
+        // {
+        //     "Name": "dotres_debug_draw_dimensions",
+        //     "DefaultValue": "0 0 0"
+        // },
+        // {
+        //     "Name": "dotres_debug_test_color",
+        //     "DefaultValue": "0 0 0"
+        // }
     ],
     "Scripts": [
         {
@@ -59,18 +59,18 @@
             }
         },
         {
-            "Path": "ui/profiles_menu.nut",
+            "Path": "ui/negativ_test_menu.nut",
             "RunOn": "UI",
             "UICallback": {
-                "Before": "InitProfilesMenu",
-                "After": "ProfilesAddFooter"
+                "Before": "InitNegativTestMenu",
+                "After": "InitNegativTestMenuAddFooter"
             }
         },
         {
             "Path": "ui/ms_test.nut",
             "RunOn": "UI",
             "UICallback": {
-                "Before": "ModSettingsTest"
+                "Before": "Negativbild_ModSettingsTest"
             }
         }
     ]
