@@ -5,20 +5,15 @@ global function DisableColorPicker
 global function ResetColorPicker
 global function OnColorPickerSelected
 
-global struct Color {
-  float r
-  float g
-  float b
-  float a
-  float hue
-}
-
 global struct ColorPicker {
   var palette
   var indicator
   var brightnessSlider
+  var marker
+  bool onPalette
   vector lastRelativePos // to recalculate color when changing brightness
   vector ornull lastColor
+  vector ornull markedColor
   float brightness = 1.0 // 0.0 -> 1.0
   bool liveUpdates // send a signal every frame the use hovers over the color picker with the selected color
 }
@@ -29,7 +24,7 @@ global const SIGNAL_COLOR_PICKER_SELECTED = "Negativbild_ColorPickerSelected"
 
 struct {
     ColorPicker ornull lastPicker
-    array<ColorPicker> pickers
+    array<ColorPicker> pickers // enabled pickers
 } file
 
 void function ColorPickers_Init()
@@ -40,6 +35,17 @@ void function ColorPickers_Init()
   RegisterSignal( "ColorPickerRevive" ) // TODO required?
 
   RegisterButtonPressedCallback( MOUSE_LEFT, OnPaletteClick )
+
+  /*
+  vector rgb = < 255, 200, 180 >
+  vector hsv = RGBToHSV(rgb)
+
+  printt("rgb / hsv test",
+    rgb,
+    hsv,
+    HSVToRGB(hsv.x, hsv.y, hsv.z)
+  )
+  */
 }
 
 ColorPicker function RegisterColorPicker( var picker, bool liveUpdates = false )
@@ -48,8 +54,10 @@ ColorPicker function RegisterColorPicker( var picker, bool liveUpdates = false )
   pc.palette = Hud_GetChild( picker, "ColorCircle" )
   pc.indicator = Hud_GetChild( picker, "ColorIndicator" )
   pc.brightnessSlider = Hud_GetChild( picker, "BrightnessSlider" )
+  pc.marker = Hud_GetChild( picker, "PositionMarker" )
   pc.liveUpdates = liveUpdates
 
+  // brightness slider
   RegisterScrollbar(
     pc.brightnessSlider,
     void function( int x, int y ) : ( pc )
@@ -59,25 +67,34 @@ ColorPicker function RegisterColorPicker( var picker, bool liveUpdates = false )
       int offset = Hud_GetY( slider )
       pc.brightness = 1.0 - ( float( offset ) / float( usable ) )
 
-      UpdateColorIndicator( pc, PositionToRGB( pc.lastRelativePos, pc.brightness ) )
+      if( pc.markedColor == null )
+	return
+
+      vector hsv = RGBToHSV( expect vector( pc.markedColor ) )
+      UpdateColorIndicator( pc, HSVToRGB( hsv.x, hsv.y, pc.brightness ) )
+//      UpdateColorIndicator( pc, PositionToRGB( pc.lastRelativePos, pc.brightness ) )
     }
   )
 
+  // set the slider height to be 1/10 of the available space
   SetScrollbarComponentContentHeight( pc.brightnessSlider, Hud_GetHeight( pc.brightnessSlider ) / 10 )
 
-  file.pickers.push( pc )
+  Hud_AddEventHandler(picker, UIE_CLICK, void function(var button) { print("clicked palette") } )
+
 
   return pc
 }
 
 void function EnableColorPicker( ColorPicker pc )
 {
+  file.pickers.push( pc )
   thread UpdateColorPickerIndicator( pc )
 }
 
 void function DisableColorPicker( ColorPicker pc )
 {
   Signal( pc, SIGNAL_COLOR_PICKER_DISABLED )
+  file.pickers.fastremovebyvalue( pc )
 }
 
 void function OnColorPickerSelected( ColorPicker pc, void functionref( vector ) callback )
@@ -124,8 +141,11 @@ void function UpdateColorPickerIndicator( ColorPicker pc )
     int circleDiameter = Hud_GetWidth( pc.palette )
     int circleRadius = circleDiameter / 2
     vector origin = < circleAbsX + circleRadius, circleAbsY + circleRadius, 0 >
+
+    bool wasOnPalette = pc.onPalette
+    pc.onPalette = PointOnCircle( pos, origin, circleRadius )
     
-    if( PointOnCircle( pos, origin, circleRadius ) )
+    if( pc.onPalette )
     {
       vector circleCenter = < circleAbsX + circleDiameter / 2, circleAbsY + circleDiameter / 2, 0 >
       vector rp = pos - circleCenter
@@ -138,6 +158,10 @@ void function UpdateColorPickerIndicator( ColorPicker pc )
       pc.lastColor = rgb
       pc.lastRelativePos = rp
       Signal( pc, SIGNAL_COLOR_PICKER_UPDATED, { color = rgb } )
+    }
+    else if( wasOnPalette && pc.markedColor != null )
+    {
+      UpdateColorIndicator( pc, expect vector( pc.markedColor ) )
     }
 
     WaitFrame()
@@ -167,6 +191,18 @@ float function RadiansToDegree( float rad ) {
   return (360 + 180 * rad / PI) % 360;
 }
 
+vector function RGBToHSV( vector rgb )
+{
+  float r = rgb.x / 255.0
+  float g = rgb.y / 255.0
+  float b = rgb.z / 255.0
+
+  float v = max( r, max( g, b ) )
+  float c = v - min( r, min( g, b ) )
+  float h = c && ((v == r) ? (g - b) / c : ((v == g) ? 2 + (b - r) / c : 4 + (r - g) / c))
+  return < 60 * (h < 0 ? h + 6 : h), (v ? c / v : 0.0), v >
+}
+
 vector function HSVToRGB( float hue, float saturation, float brightness) {
   hue /= 60;
   float chroma = brightness * saturation;
@@ -193,19 +229,19 @@ int[2] function GetAbsolutePaletteCenter( ColorPicker pc )
 
 // TODO I'm 90% sure this doesn't work
 // didn't test with multiple pickers though
-ColorPicker function FindNearestPickerToPos( vector pos )
+ColorPicker ornull function FindNearestPickerToPos( vector pos )
 {
-  ColorPicker nearest = file.pickers[0]
-  int[2] firstCenter = GetAbsolutePaletteCenter( nearest )
-  float distToNearest = Distance2D( < firstCenter[0], firstCenter[1], 0 >, pos )
+  ColorPicker ornull nearest = null
+  float distToNearest
 
-  for( int i = 1; i < file.pickers.len(); i++ )
+  foreach( pc in file.pickers )
   {
-    ColorPicker pc = file.pickers[i]
     int[2] center = GetAbsolutePaletteCenter( pc )
-    if( Distance2D( < center[0], center[1], 0 >, pos ) < distToNearest )
+    float dist = Distance2D( < center[0], center[1], 0 >, pos )
+    if( nearest == null || ( dist < distToNearest ) )
     {
       nearest = pc
+      distToNearest = dist
     }
   }
 
@@ -221,7 +257,12 @@ void function OnPaletteClick( var button )
 
   expect vector( p )
 
-  ColorPicker picker = FindNearestPickerToPos( p )
+  ColorPicker ornull picker = FindNearestPickerToPos( p )
+
+  if( picker == null )
+    return
+
+  expect ColorPicker( picker )
 
   var circle = picker.palette
   int circleAbsX = Hud_GetAbsX( circle )
@@ -229,8 +270,17 @@ void function OnPaletteClick( var button )
   int circleRadius = Hud_GetWidth( circle ) / 2
   vector origin = < circleAbsX + circleRadius, circleAbsY + circleRadius, 0 >
 
-  // abort if the user didn't click on any picker
-  if( !PointOnCircle( p, origin, circleRadius ) ) return
+  // no color picker was clicked
+  if( !PointOnCircle( p, origin, circleRadius ) )
+    return
+
+  // TODO make this dynamic?
+  int markerOffset = 3
+  Hud_SetAbsPos( picker.marker, int( p.x - circleAbsX ) - markerOffset, int( p.y - circleAbsY ) - markerOffset )
+  Hud_Show( picker.marker )
+
+  file.lastPicker = picker
+  picker.markedColor = picker.lastColor
 
   Signal( picker, SIGNAL_COLOR_PICKER_SELECTED, { color = expect vector( picker.lastColor ) } )
 }

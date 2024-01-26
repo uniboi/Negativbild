@@ -31,16 +31,29 @@ resource/ui/menus/panels/color_picker.res
 
 	ColorIndicator
 	{
-		ControlName ImagePanel
-		image		vgui/hud/white
-		scaleImage	1
+	  ControlName	ImagePanel
+	  image		vgui/hud/white
+	  scaleImage	1
 
-		tall	50
-		wide	50
-		xpos	25
+	  tall	50
+	  wide	50
+	  xpos	25
 
-		pin_to_sibling		BrightnessSlider
-		pin_corner_to_sibling	LEFT
-		pin_to_sibling_corner	RIGHT
+	  pin_to_sibling	BrightnessSlider
+	  pin_corner_to_sibling	LEFT
+	  pin_to_sibling_corner	RIGHT
+	}
+
+	PositionMarker
+	{
+	  ControlName	ImagePanel
+	  image		vgui/hud/white
+	  scaleImage	1
+	  drawColor	"0 0 0 255"
+
+	  tall	5
+	  wide	5
+
+	  visible	0
 	}
 }
