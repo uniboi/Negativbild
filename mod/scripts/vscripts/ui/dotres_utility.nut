@@ -1,7 +1,7 @@
 untyped
 globalize_all_functions
 
-global const bool NEGATIVBILD_DEV = false
+global const bool NEGATIVBILD_DEV = true
 
 void function Negativbild_Init()
 {
@@ -69,6 +69,7 @@ void function ModSettings_AddDropDown( string conVar, string buttonLabel, array<
     )
 }
 
+/*
 void function ModSettings_AddColorPicker( string conVar, string buttonLabel, bool liveUpdate = false )
 {
     ModSettings_AddButton( buttonLabel,
@@ -82,6 +83,19 @@ void function ModSettings_AddColorPicker( string conVar, string buttonLabel, boo
             }()
         }, 3
     )
+}
+*/
+
+void function ModSettings_AddColorPicker( string conVar, string buttonLabel, bool liveUpdate = false, int depth = 3 )
+{
+  ModSettings_AddButton(
+    buttonLabel,
+    void function() : ( conVar )
+    {
+      OpenColorPickerDialog( conVar )
+    },
+    depth
+  )
 }
 
 // TODO: is this right? idk

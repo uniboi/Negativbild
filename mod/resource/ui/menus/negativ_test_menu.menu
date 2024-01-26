@@ -168,7 +168,7 @@ resource/ui/menus/profiles_menu.menu
 		ControlName	CNestedPanel
 		controlSettingsFile	"resource/ui/menus/panels/color_picker.res"
 
-		wide	375
+		wide	450
 		tall	300
 
 		pin_to_sibling				TestList

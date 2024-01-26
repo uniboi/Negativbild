@@ -29,7 +29,7 @@ void function InitColorPickerMenu()
 	Hud_AddEventHandler( screen, UIE_CLICK, OnScreen_BGActivate )
 	Hud_AddEventHandler( Hud_GetChild( file.menu, "ResetButton" ), UIE_CLICK, OnResetButtonPressed )
 
-    file.picker = RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
+//    file.picker = RegisterColorPicker( Hud_GetChild( file.menu, "ColorPicker" ) )
 }
 
 void function OnDialog_Open()

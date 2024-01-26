@@ -166,12 +166,10 @@ To enable a color picker, signal `ColorPickerRevive` (for example when opening a
   	ControlName	CNestedPanel
   	controlSettingsFile	"resource/ui/menus/panels/color_picker.res"
 
-  	wide	375
-  	wide	300
+  	wide	450 // minimum width
+  	tall    300 // minimum height
   }
   ```
-
-  The vgui element needs to be 75 pixels wider than high to be able to correctly render the color preview patch.
 
 ### Color Picker Dialog
 
